@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Optional
 
 import requests
-
 from logger import setup_logger
 
 

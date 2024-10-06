@@ -1,7 +1,6 @@
 from typing import Optional
 
 import requests
-
 from logger import setup_logger
 
 logger = setup_logger(name="sample.log")
