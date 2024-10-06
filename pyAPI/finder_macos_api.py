@@ -8,7 +8,7 @@ class FileSearchAPP:
     def __init__(self):
         self.app = Flask(__name__)
         self.base_directory = str(Path.home().resolve())
-        self.threshold_sizes = {"MB": 1024 * 1024, "KB": 1024}
+        self.threshold_sizes = {"MB": 100 * 1024 * 1024, "GB": 1024 * 1024 * 1024}
         self._register_routes()
 
     def _register_routes(self):
@@ -82,14 +82,17 @@ class FileSearchAPP:
         if not directory:
             return jsonify({"error": "Directory name is required"})
         files = {
-            str(file): self._get_file_size(file)
+            str(file): self._get_size(file)
             for file in list(Path(directory).glob("*"))
             if file.is_file()
         }
         return jsonify({"file_sizes": files})
 
-    def _get_file_size(self, file):
-        return file.stat().st_size
+    def _get_size(self, path: Path):
+        if path.is_file():
+            return path.stat().st_size
+        elif path.is_dir():
+            return self._get_dir_size(path)
 
     def _get_dir_size(self, path):
         process = subprocess.run(
@@ -106,7 +109,7 @@ class FileSearchAPP:
         if not Path(directory).exists():
             return jsonify({"error": f"Directory {directory} does not exist"})
         dirs = {
-            str(dirs): self._get_dir_size(dirs.resolve())
+            str(dirs): self._get_size(dirs.resolve())
             for dirs in list(Path(directory).glob("*"))
             if dirs.is_dir()
         }
@@ -124,11 +127,11 @@ class FileSearchAPP:
             return jsonify({"error": f"Directory {directory} does not exist"})
 
         files = {
-            str(file): self._get_file_size(file)
+            str(file): self._get_size(file)
             for file in list(
                 Path(directory).glob(pattern=f"*{file_name}*" if file_name else "*")
             )
-            if (file.is_file() and self._get_file_size(file) < size_threshold_bytes)
+            if (file.is_file() and self._get_size(file) < size_threshold_bytes)
         }
         return (
             jsonify(
@@ -154,12 +157,9 @@ class FileSearchAPP:
             return jsonify({"error": f"Directory {directory} does not exist"})
 
         dirs = {
-            str(dirs): self._get_dir_size(dirs.resolve())
+            str(dirs): self._get_size(dirs.resolve())
             for dirs in list(Path(directory).glob(pattern="*"))
-            if (
-                dirs.is_dir()
-                and self._get_dir_size(dirs.resolve()) < size_threshold_bytes
-            )
+            if (dirs.is_dir() and self._get_size(dirs.resolve()) < size_threshold_bytes)
         }
         return (
             jsonify(
