@@ -1,13 +1,13 @@
 import logging
 
 
-def setup_logger(name, log_file="weather.log", level=logging.DEBUG):
+def setup_logger(name, level=logging.DEBUG):
     """Set up a logger that writes to both a log file and the console."""
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
     if not logger.hasHandlers():
-        file_handler = logging.FileHandler(log_file)
+        file_handler = logging.FileHandler(name, mode="w")
         file_handler.setLevel(level)
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
@@ -21,7 +21,7 @@ def setup_logger(name, log_file="weather.log", level=logging.DEBUG):
     return logger
 
 
-logger = setup_logger("weather-api")
+# logger = setup_logger()
 
 # Example usage
 # logger.info("This is an info message from the weather API")

@@ -2,10 +2,11 @@ import json
 import time
 from collections import defaultdict
 from pathlib import Path
+from typing import Optional
 
 import requests
 
-from logger import logger
+from logger import setup_logger
 
 
 class WeatherData:
@@ -13,6 +14,7 @@ class WeatherData:
         self.lat = lat
         self.lon = lon
         self.data = defaultdict(list)
+        self.file = "weather_data.json"
         self.url = "https://api.open-meteo.com/v1/forecast"
 
     def get_weather_data(self):
@@ -25,6 +27,8 @@ class WeatherData:
                     "current": "temperature_2m",
                 },
             )
+            if not response.ok:
+                raise Exception(f"{response.reason}: {response.text}")
             return response.json()
         except Exception as e:
             logger.error(e)
@@ -41,14 +45,19 @@ class WeatherData:
             time.sleep(time_sleep)
         return self.data
 
-    def dump_data(self):
-        with open(Path.cwd() / "weather_data.json", "w") as f:
-            json.dump(self.data, f)
+    def dump_data(self, data: Optional[dict] = None):
+        if data:
+            with open(Path.cwd() / self.file, "w") as f:
+                json.dump(data, f)
+        else:
+            with open(Path.cwd() / self.file, "w") as f:
+                json.dump(self.data, f)
 
 
 if __name__ == "__main__":
+    logger = setup_logger(name="weather.log")
     logger.info("Starting Weather API")
     weather_data = WeatherData(lat=51.5, lon=-0.11)
-    collected_data = weather_data.collect_data(time_sleep=10, times=10)
+    collected_data = weather_data.collect_data(time_sleep=1, times=1)
     logger.info(collected_data)
     weather_data.dump_data()
