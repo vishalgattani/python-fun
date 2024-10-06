@@ -1,3 +1,4 @@
+import subprocess
 from pathlib import Path
 
 from flask import Flask, jsonify, request
@@ -48,7 +49,7 @@ class FileSearchAPP:
                 if x.is_file()
             ]
         if files:
-            return jsonify({"message": "File(s) found", "files": files})
+            return jsonify({"message": "File(s) found", "files": files}), 200
         else:
             return jsonify({"message": "File(s) not found", "files": []})
 
@@ -72,7 +73,7 @@ class FileSearchAPP:
                 if x.is_dir()
             ]
         if dirs:
-            return jsonify({"message": "Directory found", "directories": dirs})
+            return jsonify({"message": "Directory found", "directories": dirs}), 200
         else:
             return jsonify({"message": "Directory not found", "directories": []})
 
@@ -87,6 +88,14 @@ class FileSearchAPP:
         }
         return jsonify({"file_sizes": files})
 
+    def _get_dir_size(self, path):
+        process = subprocess.run(
+            ["du", "-s", "-b", str(path)],  # Use a list for command arguments
+            capture_output=True,  # Capture standard output and error
+            text=True,  # Return output as a string (not bytes)
+        )
+        return process.stdout.strip().split()[0]
+
     def get_directory_size(self):
         directory = request.args.get("directory")
         if not directory:
@@ -94,11 +103,11 @@ class FileSearchAPP:
         if not Path(directory).exists():
             return jsonify({"error": f"Directory {directory} does not exist"})
         dirs = {
-            str(dirs): dirs.stat().st_size
+            str(dirs): self._get_dir_size(dirs.resolve())
             for dirs in list(Path(directory).glob("*"))
             if dirs.is_dir()
         }
-        return jsonify({"directory_name": dirs})
+        return jsonify({"directory_name": dirs}), 200
 
     def filter_files(self):
         size_threshold_bytes = int(
@@ -118,14 +127,17 @@ class FileSearchAPP:
             )
             if (file.is_file() and file.stat().st_size < size_threshold_bytes)
         }
-        return jsonify(
-            {
-                "file_sizes": {
-                    "search_directory": directory,
-                    "files": files,
-                    "threshold": size_threshold_bytes,
+        return (
+            jsonify(
+                {
+                    "file_sizes": {
+                        "search_directory": directory,
+                        "files": files,
+                        "threshold": size_threshold_bytes,
+                    }
                 }
-            }
+            ),
+            200,
         )
 
     def filter_directory(self):
@@ -139,17 +151,20 @@ class FileSearchAPP:
             return jsonify({"error": f"Directory {directory} does not exist"})
 
         dirs = {
-            str(dirs): dirs.stat().st_size
+            str(dirs): self._get_dir_size(dirs.resolve())
             for dirs in list(Path(directory).glob(pattern="*"))
-            if (dirs.is_dir() and dir.stat().st_size < size_threshold_bytes)
+            if (dirs.is_dir() and dirs.stat().st_size < size_threshold_bytes)
         }
-        return jsonify(
-            {
-                "directory_sizes": {
-                    "directories": dirs,
-                    "threshold": size_threshold_bytes,
+        return (
+            jsonify(
+                {
+                    "directory_sizes": {
+                        "directories": dirs,
+                        "threshold": size_threshold_bytes,
+                    }
                 }
-            }
+            ),
+            200,
         )
 
     def run(self):
