@@ -4,7 +4,7 @@ from pathlib import Path
 from flask import Flask, jsonify, request
 
 
-class FileSearchAPP:
+class FinderAPP:
     def __init__(self):
         self.app = Flask(__name__)
         self.base_directory = str(Path.home().resolve())
@@ -179,7 +179,7 @@ class FileSearchAPP:
 
 
 def main():
-    app_instance = FileSearchAPP()
+    app_instance = FinderAPP()
     app_instance.run()
 
 
