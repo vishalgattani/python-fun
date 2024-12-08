@@ -1,3 +1,10 @@
+"""Nvidia GPU tracker.
+
+For more queries, use the following command:
+
+nvidia-smi --help-query-gpu
+"""
+
 import logging
 import subprocess
 import threading 
