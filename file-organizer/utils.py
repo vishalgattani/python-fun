@@ -1,8 +1,10 @@
-from pathlib import Path
-import shutil
 import logging
+import shutil
+from pathlib import Path
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 def get_file_size(file_path: Path) -> int:
     """Get file size.
@@ -15,7 +17,8 @@ def get_file_size(file_path: Path) -> int:
     """
     return file_path.stat().st_size
 
-def collect_files(path: Path, pattern:str = "*.*", recursive: bool = False) -> list:
+
+def collect_files(path: Path, pattern: str = "*.*", recursive: bool = False) -> list:
     """Collect files from a directory.
 
     Args:
@@ -31,6 +34,7 @@ def collect_files(path: Path, pattern:str = "*.*", recursive: bool = False) -> l
     else:
         return list(path.glob(pattern))
 
+
 def is_compressed(file_path: Path) -> bool:
     """Check if a file is compressed.
 
@@ -42,6 +46,7 @@ def is_compressed(file_path: Path) -> bool:
     """
     return file_path.suffix in (".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz")
 
+
 def is_audio(file_path: Path) -> bool:
     """Check if a file is an audio file.
 
@@ -51,12 +56,37 @@ def is_audio(file_path: Path) -> bool:
     Returns:
         bool: True if the file is an audio file, False otherwise.
     """
-    return file_path.suffix in (".3ga", ".aac", ".ac3", ".aif", ".aiff",
-         ".alac", ".amr", ".ape", ".au", ".dss",
-         ".flac", ".flv", ".m4a", ".m4b", ".m4p",
-         ".mp3", ".mpga", ".ogg", ".oga", ".mogg",
-         ".opus", ".qcp", ".tta", ".voc", ".wav",
-         ".wma", ".wv", ".mpeg")
+    return file_path.suffix in (
+        ".3ga",
+        ".aac",
+        ".ac3",
+        ".aif",
+        ".aiff",
+        ".alac",
+        ".amr",
+        ".ape",
+        ".au",
+        ".dss",
+        ".flac",
+        ".flv",
+        ".m4a",
+        ".m4b",
+        ".m4p",
+        ".mp3",
+        ".mpga",
+        ".ogg",
+        ".oga",
+        ".mogg",
+        ".opus",
+        ".qcp",
+        ".tta",
+        ".voc",
+        ".wav",
+        ".wma",
+        ".wv",
+        ".mpeg",
+    )
+
 
 def is_pkg(file_path: Path) -> bool:
     """Check if a file is a package.
@@ -67,7 +97,17 @@ def is_pkg(file_path: Path) -> bool:
     Returns:
         bool: True if the file is a package, False otherwise.
     """
-    return file_path.suffix in (".apk", ".ipa", ".deb", ".rpm", ".jar", ".exe", ".msi", ".pkg")
+    return file_path.suffix in (
+        ".apk",
+        ".ipa",
+        ".deb",
+        ".rpm",
+        ".jar",
+        ".exe",
+        ".msi",
+        ".pkg",
+    )
+
 
 def is_dmg(file_path: Path) -> bool:
     """Check if a file is a dmg file.
@@ -80,6 +120,7 @@ def is_dmg(file_path: Path) -> bool:
     """
     return file_path.suffix in (".dmg")
 
+
 def is_image(file_path: Path) -> bool:
     """Check if a file is an image file.
 
@@ -89,7 +130,18 @@ def is_image(file_path: Path) -> bool:
     Returns:
         bool: True if the file is an image file, False otherwise.
     """
-    return file_path.suffix in (".bmp", ".gif", ".jpg", ".jpeg", ".png", ".psd", ".svg", ".tif", ".tiff")
+    return file_path.suffix in (
+        ".bmp",
+        ".gif",
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".psd",
+        ".svg",
+        ".tif",
+        ".tiff",
+    )
+
 
 def is_screenshot(file_path: Path) -> bool:
     """Check if a file is a screenshot.
@@ -102,6 +154,7 @@ def is_screenshot(file_path: Path) -> bool:
     """
     return is_image(file_path) and "screenshot" in file_path.name.lower()
 
+
 def is_document(file_path: Path) -> bool:
     """Check if a file is a document.
 
@@ -111,7 +164,17 @@ def is_document(file_path: Path) -> bool:
     Returns:
         bool: True if the file is a document, False otherwise.
     """
-    return file_path.suffix in (".doc", ".docx", ".odt", ".pdf", ".rtf", ".tex", ".txt", ".wpd")
+    return file_path.suffix in (
+        ".doc",
+        ".docx",
+        ".odt",
+        ".pdf",
+        ".rtf",
+        ".tex",
+        ".txt",
+        ".wpd",
+    )
+
 
 def is_video(file_path: Path) -> bool:
     """Check if a file is a video file.
@@ -122,8 +185,18 @@ def is_video(file_path: Path) -> bool:
     Returns:
         bool: True if the file is a video file, False otherwise.
     """
-    return file_path.suffix in (".webm", ".MTS", ".M2TS", ".TS", ".mov",
-         ".mp4", ".m4p", ".m4v", ".mxf")
+    return file_path.suffix in (
+        ".webm",
+        ".MTS",
+        ".M2TS",
+        ".TS",
+        ".mov",
+        ".mp4",
+        ".m4p",
+        ".m4v",
+        ".mxf",
+    )
+
 
 def move_file(file_path: Path, destination: Path) -> None:
     """Move a file to a destination.
@@ -147,7 +220,8 @@ def move_file(file_path: Path, destination: Path) -> None:
         logger.error(e)
         logger.exception("Unexpected error occurred.")
 
-def organize_files(directory_to_scan: Path, recursive:bool = False) -> None:
+
+def organize_files(directory_to_scan: Path, recursive: bool = False) -> None:
     """Organize files in a directory.
 
     Args:
@@ -157,21 +231,21 @@ def organize_files(directory_to_scan: Path, recursive:bool = False) -> None:
     all_files = collect_files(path=directory_to_scan, recursive=recursive)
     for file in all_files:
         if is_audio(file_path=file):
-            move_file(file_path=file, destination=directory_to_scan/"audios")
+            move_file(file_path=file, destination=directory_to_scan / "audios")
         elif is_image(file_path=file):
             if is_screenshot(file_path=file):
-                move_file(file_path=file, destination=directory_to_scan/"screenshots")
+                move_file(file_path=file, destination=directory_to_scan / "screenshots")
             else:
-                move_file(file_path=file, destination=directory_to_scan/"images")
+                move_file(file_path=file, destination=directory_to_scan / "images")
         elif is_video(file_path=file):
-            move_file(file_path=file, destination=directory_to_scan/"videos")
+            move_file(file_path=file, destination=directory_to_scan / "videos")
         elif is_document(file_path=file):
-            move_file(file_path=file, destination=directory_to_scan/"docs")
+            move_file(file_path=file, destination=directory_to_scan / "docs")
         elif is_pkg(file_path=file):
-            move_file(file_path=file, destination=directory_to_scan/"pkgs")
+            move_file(file_path=file, destination=directory_to_scan / "pkgs")
         elif is_dmg(file_path=file):
-            move_file(file_path=file, destination=directory_to_scan/"dmg")
+            move_file(file_path=file, destination=directory_to_scan / "dmg")
         elif is_compressed(file_path=file):
-            move_file(file_path=file, destination=directory_to_scan/"compressed")
+            move_file(file_path=file, destination=directory_to_scan / "compressed")
         else:
             logger.warning(f"Skipping {file}")

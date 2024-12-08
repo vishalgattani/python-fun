@@ -8,13 +8,13 @@ Usage:
 """
 
 import argparse
-from pathlib import Path
+
 
 def init_argparse() -> argparse.ArgumentParser:
     """Get arguments
 
     Returns:
-        argparse.Namespace: a utility function for parsing command-line arguments and returns the parsed arguments as an argparse.Namespace object.
+        argparse.Namespace: a utility function for parsing command-line arguments.
     """
     parser = argparse.ArgumentParser(
         prog="File organizer",
