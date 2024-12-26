@@ -1,3 +1,7 @@
+"""Utililty functions for file organizer.
+Author: Vishal Gattani
+"""
+
 import logging
 import shutil
 from pathlib import Path
